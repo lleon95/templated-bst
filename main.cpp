@@ -36,6 +36,9 @@ int main(){
   /* Test the subscriptor */
   mytree[15] = 5;
   std::cout << mytree[1] << std::endl;
+
+  /* Test the emplace */
+  mytree.emplace(100,2);
   std::cout << "Ostream \n" << mytree << std::endl;
 
   /* Clear */

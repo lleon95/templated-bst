@@ -208,6 +208,14 @@ public:
     return std::get<1>(*it);
   }
 
+  /**
+   * @brief Emplace
+   */
+  template< class ... Types >
+  std::pair<iterator, bool> emplace(Types&&... args){
+    return insert(std::pair<KT, VT>{std::forward<Types>(args)...});
+  }
+
 };
 
 
