@@ -41,12 +41,21 @@ int main(){
   mytree.emplace(100,2);
   std::cout << "Ostream \n" << mytree << std::endl;
 
+  /* Testing move and copy semantics */
+  //bst<int, int> mytree_2cpassign = mytree;
+  //bst<int, int> mytree_2cpconst{mytree};
+
   /* Clear */
   mytree.clear();
   /* Print the tree */
   for (auto i : mytree) {
     std::cout << "Node: " << std::get<0>(i) << std::endl;
   }
+
+  /* Test others */
+  std::cout << "Ostream mytree \n" << mytree << std::endl;
+  //std::cout << "Ostream mytree_2cpassign \n" << mytree_2cpassign << std::endl;
+  //std::cout << "Ostream mytree_2cpconst \n" << mytree_2cpconst << std::endl;
 
   return 0;
 }

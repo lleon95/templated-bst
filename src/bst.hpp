@@ -131,6 +131,13 @@ public:
     } 
     return iterator{bin->get()};
   }
+  const_iterator find(const KT& key) const {
+    auto bin = std::get<0>(look_up(key, &root));
+    if (!bin->get()) {
+      return end();
+    } 
+    return const_iterator{bin->get()};
+  }
 
   /**
    * @brief Insertion Method
