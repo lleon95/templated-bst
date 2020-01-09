@@ -23,25 +23,25 @@ class bst{
     std::unique_ptr<node> parent;
     std::unique_ptr<node> left_child;
     std::unique_ptr<node> right_child;
-
-    /**
-     * @brief Auxiliar function to walk into the tree
-     * @details This method will get the lower leave from the current node
-     * This will be used to get the next element, when executing this method
-     * from the right child of the current node.
-     */
-    node * const get_lower() {
-      if(this->left_child) {
-        return this->left_child->get_lower();
-      }
-      return this;
-    }
   };
   
   /**
    * @brief Pointer the root node
    */
   std::unique_ptr<node> root;
+
+  /**
+   * @brief Auxiliar function to walk into the tree
+   * @details This method will get the lower leave from the current node
+   * This will be used to get the next element, when executing this method
+   * from the right child of the current node.
+   */
+  node * const get_lower(node * const leave) {
+    if(leave->left_child) {
+      return get_lower(leave->left_child);
+    }
+    return leave;
+  }
 
   /**
    * @brief Iterator class
@@ -52,6 +52,22 @@ class bst{
 
   using iterator = __iterator< std::pair<const KT, VT> >;
   using const_iterator = __iterator< const std::pair<const KT, VT> >;
+
+  /**
+   * @brief Iterator methods
+   * @details The first element (left-most) will be the first, whereas the 
+   * last one is the right-most (one-past the right-most) 
+   */
+  iterator begin() noexcept {return iterator{get_lower(root.get());}
+  iterator end() {return iterator{nullptr};}
+  
+  /* From a range for loop */
+  const_iterator begin() const {return const_iterator{get_lower(root.get());}
+  const_iterator end() const {return const_iterator{nullptr};}
+  
+  /* Elevated user */
+  const_iterator cbegin() const {return const_iterator{get_lower(root.get());}
+  const_iterator cend() const {return const_iterator{nullptr};}
 
 };
 
@@ -79,7 +95,7 @@ public:
   /* Pre-increment */
   __iterator& operator++() noexcept 
   { 
-    current = current->right_child.get()->get_lower(); 
+    current = get_lower(current->right_child.get()); 
     return *this;
   }
 
