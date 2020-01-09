@@ -173,9 +173,17 @@ public:
   }
 
   /**
-   * @brief Find method
-   * @details find core
+   * @brief Put-to operator
+   * @details 
    */
+  friend std::ostream & operator<<(std::ostream& os, const bst& x){
+    os << "BST: { ";
+    for(auto i : x) {
+      os << std::get<0>(i) << "," << std::get<1>(i) << " ";
+    }
+    os << "} ";
+    return os;
+  }
 
 };
 

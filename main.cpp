@@ -16,13 +16,15 @@ int main(){
     int key = rand() % 100;
     pair = std::make_pair(key,3);
     result = mytree.insert(pair);
-    auto it = std::get<0>(result);
   }
 
   /* Print the tree */
   for (auto i : mytree) {
     std::cout << "Node: " << std::get<0>(i) << std::endl;
   }
+
+  std::cout << "Ostream \n" << mytree << std::endl;
+  
 
   /* Look for a key */
   auto elem = mytree.find(16);
@@ -39,6 +41,6 @@ int main(){
   for (auto i : mytree) {
     std::cout << "Node: " << std::get<0>(i) << std::endl;
   }
-  
+
   return 0;
 }
