@@ -16,6 +16,17 @@ int main(){
     int key = rand() % 100;
     pair = std::make_pair(key,3);
     result = mytree.insert(pair);
+    auto it = std::get<0>(result);
+    std::cout << "Inserted: " << key << " at "<< &it << std::endl;
   }
+
+  /* Print the tree */
+  auto begin = mytree.begin();
+  auto end = mytree.end();
+
+
+  std::cout << "Start: " << std::get<0>(*begin) << std::endl;
+  begin++;
+  std::cout << "Next: " << std::get<0>(*begin) << std::endl;
   return 0;
 }

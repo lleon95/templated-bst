@@ -43,9 +43,12 @@ public:
    * This will be used to get the next element, when executing this method
    * from the right child of the current node.
    */
-  node * get_lower(node * const leave) {
+  static node * get_lower(node * leave) {
+    std::cout << "Leave: " << std::get<0>(leave->pair) << std::endl;
+    if(!leave) return nullptr;
+
     if(leave->left_child) {
-      return get_lower(leave->left_child);
+      return get_lower(leave->left_child.get());
     }
     return leave;
   }
@@ -104,7 +107,7 @@ public:
       auto node_key = std::get<0>(node_bin->pair);
       std::cout << "Key - node: " << node_key << std::endl;
       /* Case less */
-      if(node_key < target_k) {
+      if(target_k < node_key) {
         if (!node_bin->left_child) {
           node_bin->left_child = std::make_unique<node>(x);
           return std::make_pair(iterator{node_bin->left_child.get()}, true);
@@ -149,7 +152,8 @@ public:
   /* Pre-increment */
   __iterator& operator++() noexcept 
   { 
-    current = get_lower(current->right_child.get()); 
+    current = bst<KT, VT, CMP>::get_lower(current->right_child.get()); 
+    std::cout << "Current: " << current << std::endl;
     return *this;
   }
 
@@ -164,6 +168,15 @@ public:
   friend
   bool operator==(const __iterator& a, const __iterator& b)
   {
-    return !(a == b);
+    return (*a == *b);
   }
+
+  friend
+  bool operator!=(const __iterator& a, const __iterator& b)
+  {
+    return !(*a == *b);
+  }
+
+  
+
 };
