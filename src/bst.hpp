@@ -27,9 +27,15 @@ class bst{
     std::unique_ptr<node> right_child;
 
     node() noexcept = default;
+    ~node() noexcept {
+      std::cout << "Node destroyed" << std::endl;
+    };
 
-    node(const std::pair<const KT, VT> &p) : pair{p}, left_child{nullptr}, right_child{nullptr} {
-      std::cout << "Constructor: " << std::get<0>(p) << std::endl;
+    explicit node(const std::pair<const KT, VT> &p) : pair{p}, left_child{nullptr}, right_child{nullptr} {
+      std::cout << "CConstructor: " << std::get<0>(p) << std::endl;
+    };
+    explicit node(std::pair<const KT, VT> &&p) : pair{std::move(p)}, left_child{nullptr}, right_child{nullptr} {
+      std::cout << "MConstructor: " << std::get<0>(p) << std::endl;
     };
     node& operator=(const std::pair<const KT, VT> &p) {*this.pair = p; return *this;}
   };
@@ -39,6 +45,14 @@ public:
    * @brief Pointer the root node
    */
   std::unique_ptr<node> root;
+
+  /**
+   * @brief Clear
+   */
+  void clear(){
+    auto root_node = root.release();
+    delete root_node;
+  }
 
   /**
    * @brief Auxiliar function to walk into the tree
@@ -89,47 +103,80 @@ public:
   const_iterator cend() const {return const_iterator{nullptr};}
  
   /**
+   * @brief Lookup 
+   */
+  auto look_up (const KT key, std::unique_ptr<node> * bin, node * parent = nullptr) {
+    if (!(*bin)) {
+      return std::make_pair(bin, parent);
+    } else {
+      auto bin_key = std::get<0>(bin->get()->pair);
+      std::cout << "Key - target: " << bin_key << std::endl;
+      if (key < bin_key) {
+        return look_up(key, &(bin->get()->left_child), bin->get());
+      } else if (key == bin_key) {
+        return std::make_pair(bin, parent);
+      } else {
+        return look_up(key, &(bin->get()->right_child), bin->get());
+      }
+    }
+  }
+
+  /**
+   * @brief Find
+  */
+  iterator find(const KT& key) {
+    auto bin = std::get<0>(look_up(key, &root));
+    if (!bin->get()) {
+      return end();
+    } 
+    return iterator{bin->get()};
+  }
+
+  /**
    * @brief Insertion Method
    * @details This inserts a new node in case it does not exist. In case it 
    * exist, it won't overwrite the value, but the iterator is returned
    */
   std::pair<iterator, bool> insert(const std::pair<KT, VT>& x) {
     /* Get the key */
+    std::cout << "Copy insert" << std::endl;
     auto target_k = std::get<0>(x);
-    std::cout << "Key - target: " << target_k << std::endl;
-    /* Get the node bin */
-    if (!root) {
-      root = std::make_unique<node>(x);
-      return std::make_pair(iterator{root.get()}, true);
-    }
+    auto elem_lookup = look_up(target_k, &root);
 
-    auto node_bin = root.get();
-
-    while(true) {
-      auto node_key = std::get<0>(node_bin->pair);
-      std::cout << "Key - node: " << node_key << std::endl;
-      /* Case less */
-      if(target_k < node_key) {
-        if (!node_bin->left_child) {
-          node_bin->left_child = std::make_unique<node>(x);
-          node_bin->left_child.get()->parent = node_bin;
-          return std::make_pair(iterator{node_bin->left_child.get()}, true);
-        } else {
-          node_bin = node_bin->left_child.get();
-        }
-      } else if(node_key == target_k) {
-        return std::make_pair(iterator{node_bin}, false);
-      } else {
-        if (!node_bin->right_child) {
-          node_bin->right_child = std::make_unique<node>(x);
-          node_bin->right_child.get()->parent = node_bin;
-          return std::make_pair(iterator{node_bin->right_child.get()}, true);
-        } else {
-          node_bin = node_bin->right_child.get();
-        }
-      }
-    }
+    auto bin = std::get<0>(elem_lookup);
+    auto parent = std::get<1>(elem_lookup);
+    
+    if (!bin->get()) {
+      *(bin) = std::make_unique<node>(x);
+      bin->get()->parent = parent;
+      return std::make_pair(iterator{bin->get()}, true);
+    } else {
+      return std::make_pair(iterator{bin->get()}, false);
+    } 
   }
+  std::pair<iterator, bool> insert(std::pair<KT, VT>&& x) {
+    std::cout << "Move insert" << std::endl;
+    /* Get the key */
+    auto target_k = std::get<0>(x);
+    auto elem_lookup = look_up(target_k, &root);
+
+    auto bin = std::get<0>(elem_lookup);
+    auto parent = std::get<1>(elem_lookup);
+    
+    if (!bin->get()) {
+      *(bin) = std::make_unique<node>(std::move(x));
+      bin->get()->parent = parent;
+      return std::make_pair(iterator{bin->get()}, true);
+    } else {
+      return std::make_pair(iterator{bin->get()}, false);
+    } 
+  }
+
+  /**
+   * @brief Find method
+   * @details find core
+   */
+
 };
 
 
@@ -157,7 +204,6 @@ public:
   /* Pre-increment */
   __iterator& operator++() noexcept 
   { 
-    usleep(1000000);
     /* It is a leave */
     if (!current->left_child.get() && !current->right_child.get()) {
       node * parent = current->parent;
