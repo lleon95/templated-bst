@@ -10,6 +10,7 @@
 #include <functional>
 #include <memory>
 #include <utility>
+#include <unistd.h>
 
 template <typename KT, typename VT, typename CMP = std::less<KT>>
 class bst{
@@ -21,13 +22,15 @@ class bst{
   struct node{
     std::pair<const KT, VT> pair;
 
-    std::unique_ptr<node> parent;
+    node * parent = nullptr;
     std::unique_ptr<node> left_child;
     std::unique_ptr<node> right_child;
 
     node() noexcept = default;
 
-    node(const std::pair<const KT, VT> &p) : pair{p} {};
+    node(const std::pair<const KT, VT> &p) : pair{p}, left_child{nullptr}, right_child{nullptr} {
+      std::cout << "Constructor: " << std::get<0>(p) << std::endl;
+    };
     node& operator=(const std::pair<const KT, VT> &p) {*this.pair = p; return *this;}
   };
 
@@ -44,7 +47,6 @@ public:
    * from the right child of the current node.
    */
   static node * get_lower(node * leave) {
-    std::cout << "Leave: " << std::get<0>(leave->pair) << std::endl;
     if(!leave) return nullptr;
 
     if(leave->left_child) {
@@ -110,6 +112,7 @@ public:
       if(target_k < node_key) {
         if (!node_bin->left_child) {
           node_bin->left_child = std::make_unique<node>(x);
+          node_bin->left_child.get()->parent = node_bin;
           return std::make_pair(iterator{node_bin->left_child.get()}, true);
         } else {
           node_bin = node_bin->left_child.get();
@@ -119,6 +122,7 @@ public:
       } else {
         if (!node_bin->right_child) {
           node_bin->right_child = std::make_unique<node>(x);
+          node_bin->right_child.get()->parent = node_bin;
           return std::make_pair(iterator{node_bin->right_child.get()}, true);
         } else {
           node_bin = node_bin->right_child.get();
@@ -135,7 +139,8 @@ template <typename O>
 class bst<KT, VT, CMP>::__iterator{
 
   using node = typename bst<KT, VT, CMP>::node;
-  node * current;
+  node * current, * past = nullptr;
+
   
 public:
   explicit __iterator(node * x) noexcept : current{x} {}
@@ -152,8 +157,42 @@ public:
   /* Pre-increment */
   __iterator& operator++() noexcept 
   { 
-    current = bst<KT, VT, CMP>::get_lower(current->right_child.get()); 
-    std::cout << "Current: " << current << std::endl;
+    usleep(1000000);
+    /* It is a leave */
+    if (!current->left_child.get() && !current->right_child.get()) {
+      node * parent = current->parent;
+      /* is it a left leave - just go to parent */
+      if (parent->left_child.get() == current) {
+        past = current;
+        current = current->parent;
+      }
+      /* is it a right leave - go until not being a right leave */ 
+      else {
+        while(parent->right_child.get() == current) {
+          current = parent;
+          parent = current->parent;
+          if (parent == nullptr) {
+            /* End of tree */
+            break;
+          }
+        }
+        if(parent != nullptr) {
+          past = current;
+          current = parent;
+        } else {
+          current = nullptr;
+        }
+      } 
+    } else {
+      if (past == current->left_child.get()) {
+        /* Go right */
+        past = current;
+        current = bst<KT, VT, CMP>::get_lower(current->right_child.get());
+      } else {
+        past = nullptr;
+        current = bst<KT, VT, CMP>::get_lower(current);
+      }
+    }
     return *this;
   }
 
@@ -165,18 +204,11 @@ public:
     return tmp;
   }
 
-  friend
-  bool operator==(const __iterator& a, const __iterator& b)
-  {
-    return (*a == *b);
+  friend bool operator==(const __iterator& a, const __iterator& b) {
+    return a.current == b.current;
   }
-
-  friend
-  bool operator!=(const __iterator& a, const __iterator& b)
-  {
-    return !(*a == *b);
+  friend bool operator!=(const __iterator& a, const __iterator& b) {
+    return !(a == b);
   }
-
-  
 
 };
