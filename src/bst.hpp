@@ -7,10 +7,11 @@
  * @file bst.hpp
  */
 #pragma once
+#include <functional>
 #include <memory>
 #include <utility>
 
-template <typename KT, typename VT, typename CMP>
+template <typename KT, typename VT, typename CMP = std::less<KT>>
 class bst{
   
   /**
@@ -23,8 +24,14 @@ class bst{
     std::unique_ptr<node> parent;
     std::unique_ptr<node> left_child;
     std::unique_ptr<node> right_child;
+
+    node() noexcept = default;
+
+    node(const std::pair<const KT, VT> &p) : pair{p} {};
+    node& operator=(const std::pair<const KT, VT> &p) {*this.pair = p; return *this;}
   };
-  
+
+public:
   /**
    * @brief Pointer the root node
    */
@@ -36,12 +43,19 @@ class bst{
    * This will be used to get the next element, when executing this method
    * from the right child of the current node.
    */
-  node * const get_lower(node * const leave) {
+  node * get_lower(node * const leave) {
     if(leave->left_child) {
       return get_lower(leave->left_child);
     }
     return leave;
   }
+
+  bst() noexcept = default;
+  bst(bst&& l) noexcept = default;
+  bst& operator=(bst&& l) noexcept = default;
+
+  bst(const bst& l);
+  bst& operator=(const bst& l);
 
   /**
    * @brief Iterator class
@@ -58,17 +72,57 @@ class bst{
    * @details The first element (left-most) will be the first, whereas the 
    * last one is the right-most (one-past the right-most) 
    */
-  iterator begin() noexcept {return iterator{get_lower(root.get());}
+  iterator begin() noexcept {return iterator{get_lower(root.get())};}
   iterator end() {return iterator{nullptr};}
   
   /* From a range for loop */
-  const_iterator begin() const {return const_iterator{get_lower(root.get());}
+  const_iterator begin() const {return const_iterator{get_lower(root.get())};}
   const_iterator end() const {return const_iterator{nullptr};}
   
   /* Elevated user */
-  const_iterator cbegin() const {return const_iterator{get_lower(root.get());}
+  const_iterator cbegin() const {return const_iterator{get_lower(root.get())};}
   const_iterator cend() const {return const_iterator{nullptr};}
+ 
+  /**
+   * @brief Insertion Method
+   * @details This inserts a new node in case it does not exist. In case it 
+   * exist, it won't overwrite the value, but the iterator is returned
+   */
+  std::pair<iterator, bool> insert(const std::pair<KT, VT>& x) {
+    /* Get the key */
+    auto target_k = std::get<0>(x);
+    std::cout << "Key - target: " << target_k << std::endl;
+    /* Get the node bin */
+    if (!root) {
+      root = std::make_unique<node>(x);
+      return std::make_pair(iterator{root.get()}, true);
+    }
 
+    auto node_bin = root.get();
+
+    while(true) {
+      auto node_key = std::get<0>(node_bin->pair);
+      std::cout << "Key - node: " << node_key << std::endl;
+      /* Case less */
+      if(node_key < target_k) {
+        if (!node_bin->left_child) {
+          node_bin->left_child = std::make_unique<node>(x);
+          return std::make_pair(iterator{node_bin->left_child.get()}, true);
+        } else {
+          node_bin = node_bin->left_child.get();
+        }
+      } else if(node_key == target_k) {
+        return std::make_pair(iterator{node_bin}, false);
+      } else {
+        if (!node_bin->right_child) {
+          node_bin->right_child = std::make_unique<node>(x);
+          return std::make_pair(iterator{node_bin->right_child.get()}, true);
+        } else {
+          node_bin = node_bin->right_child.get();
+        }
+      }
+    }
+  }
 };
 
 
@@ -77,7 +131,7 @@ template <typename KT, typename VT, typename CMP>
 template <typename O>
 class bst<KT, VT, CMP>::__iterator{
 
-  using node = typename List<KT, VT, CMP>::node;
+  using node = typename bst<KT, VT, CMP>::node;
   node * current;
   
 public:
@@ -113,5 +167,3 @@ public:
     return !(a == b);
   }
 };
-
-
