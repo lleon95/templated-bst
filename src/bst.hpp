@@ -185,6 +185,29 @@ public:
     return os;
   }
 
+  /**
+   * @brief Subscription operator
+   * @details
+   */
+  const VT& operator[](const KT& x) const {
+    /* Use insert with an default value */
+    auto element = std::make_pair(x, VT{});
+    auto insert_result = insert(element);
+
+    /* Return the reference */
+    auto it = std::get<0>(insert_result);
+    return std::get<1>(*it);
+  }
+  VT& operator[](KT&& x) {
+    /* Use insert with an default value */
+    auto element = std::make_pair(x, VT{});
+    auto insert_result = insert(element);
+
+    /* Return the reference */
+    auto it = std::get<0>(insert_result);
+    return std::get<1>(*it);
+  }
+
 };
 
 

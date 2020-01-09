@@ -22,8 +22,6 @@ int main(){
   for (auto i : mytree) {
     std::cout << "Node: " << std::get<0>(i) << std::endl;
   }
-
-  std::cout << "Ostream \n" << mytree << std::endl;
   
 
   /* Look for a key */
@@ -34,6 +32,11 @@ int main(){
   } else {
     std::cout << "Holder: " << std::get<0>(*elem) << "," << std::get<1>(*elem) << std::endl;
   }
+
+  /* Test the subscriptor */
+  mytree[15] = 5;
+  std::cout << mytree[1] << std::endl;
+  std::cout << "Ostream \n" << mytree << std::endl;
 
   /* Clear */
   mytree.clear();
