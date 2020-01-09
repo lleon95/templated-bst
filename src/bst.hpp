@@ -184,7 +184,7 @@ public:
         }
       } 
     } else {
-      if (past == current->left_child.get()) {
+      if (past == current->left_child.get() || !current->left_child.get()) {
         /* Go right */
         past = current;
         current = bst<KT, VT, CMP>::get_lower(current->right_child.get());
