@@ -60,8 +60,7 @@ public:
    * @brief Clear
    */
   void clear(){
-    auto root_node = root.release();
-    delete root_node;
+    this->~bst();
   }
 
   /**
@@ -164,8 +163,9 @@ public:
    */
   std::pair<iterator, bool> insert(const pair_t& x) {
     /* Get the key */
-    std::cout << "Copy insert" << std::endl;
+    
     auto target_k = std::get<0>(x);
+    std::cout << "Copy insert " << target_k << std::endl;
     auto elem_lookup = look_up(target_k, &root);
 
     auto bin = std::get<0>(elem_lookup);
@@ -252,7 +252,13 @@ public:
       buffer.push_back(i);
     }
     /* Start reordering */
-    this->~bst();
+    clear();
+    std::cout << "Buf: ";
+    for (auto i : buffer) {
+      std::cout << std::get<0>(i) << " ";
+    }
+    std::cout << std::endl;
+    
     
     size_t half = buffer.size()/2;
     size_t quarter = half/2;
@@ -260,16 +266,17 @@ public:
     insert(buffer.at(half));
     insert(buffer.at(half + quarter));
     insert(buffer.at(half - quarter));
-
     for (size_t i{1}; i <= quarter; ++i) {
       size_t leftm_left_idx = quarter - i;
       size_t leftm_right_idx = quarter + i;
       size_t rightm_left_idx = half + quarter - i;
       size_t rightm_right_idx = half + quarter + i;
+      
       if(leftm_right_idx != half)
         insert(buffer.at(leftm_right_idx));
       else if(rightm_right_idx != buffer.size())
         insert(buffer.at(rightm_right_idx));
+
       insert(buffer.at(leftm_left_idx));
       insert(buffer.at(rightm_left_idx));
     }
@@ -284,11 +291,11 @@ template <typename O>
 class bst<KT, VT, CMP>::__iterator{
 
   using node = typename bst<KT, VT, CMP>::node;
-  node * current, * past = nullptr;
+  node * current, * past;
 
   
 public:
-  explicit __iterator(node * x) noexcept : current{x} {}
+  explicit __iterator(node * x) noexcept : current{x}, past{nullptr} {}
 
   using value_type = O;
   using difference_type = std::ptrdiff_t;
@@ -302,9 +309,17 @@ public:
   /* Pre-increment */
   __iterator& operator++() noexcept 
   { 
+    node * parent = current->parent;
+    /* Root case */
+    if (!current) goto RETURN_ITER;
     /* It is a leave */
     if (!current->left_child.get() && !current->right_child.get()) {
-      node * parent = current->parent;
+      /* Root case */
+      if (!parent) {
+        current = nullptr;
+        past = current;
+        goto RETURN_ITER;
+      }
       /* is it a left leave - just go to parent */
       if (parent->left_child.get() == current) {
         past = current;
@@ -330,13 +345,32 @@ public:
     } else {
       if (past == current->left_child.get() || !current->left_child.get()) {
         /* Go right */
-        past = current;
-        current = bst<KT, VT, CMP>::get_lower(current->right_child.get());
+        if (current->right_child.get()) {
+          past = current;
+          current = bst<KT, VT, CMP>::get_lower(current->right_child.get());
+        } else {
+          while(parent->right_child.get() == current) {
+            current = parent;
+            parent = current->parent;
+            if (parent == nullptr) {
+              /* End of tree */
+              break;
+            }
+          }
+          if(parent != nullptr) {
+            past = current;
+            current = parent;
+          } else {
+            current = nullptr;
+          }
+        }
+        
       } else {
         past = nullptr;
         current = bst<KT, VT, CMP>::get_lower(current);
       }
     }
+RETURN_ITER:
     return *this;
   }
 

@@ -47,19 +47,31 @@ int main(){
   bst<int, int> mytree_2cpconstmv{std::move(mytree_2cpconst)};
   bst<int, int> mytree_2mvassign = std::move(mytree_2cpassign);
 
-  mytree_2mvassign.balance();
-
   /* Clear */
   mytree.clear();
+  for(int i = 0; i < 10; ++i) {
+    int key = rand() % 100;
+    pair = std::make_pair(key,3);
+    result = mytree.insert(pair);
+  }
   /* Print the tree */
   for (auto i : mytree) {
     std::cout << "Node: " << std::get<0>(i) << std::endl;
+  }
+  /* Look for a key */
+  elem = mytree.find(59);
+  end = mytree.end();
+  if (elem == end) {
+    std::cout << "Holder: empty" << std::endl;
+  } else {
+    std::cout << "Holder: " << std::get<0>(*elem) << "," << std::get<1>(*elem) << std::endl;
   }
 
   /* Test others */
   std::cout << "Ostream mytree \n" << mytree << std::endl;
   std::cout << "Ostream mytree_2cpassign \n" << mytree_2mvassign << std::endl;
   std::cout << "Ostream mytree_2cpconst \n" << mytree_2cpconstmv << std::endl;
-
+  mytree_2mvassign.balance();
+  std::cout << "Ostream mytree_2cpassign \n" << mytree_2mvassign << std::endl;
   return 0;
 }
