@@ -84,7 +84,7 @@ public:
   bst& operator=(bst&& l) noexcept = default;
   
   bst& operator=(const bst& l) {
-    ~bst();
+    this->clear();
     root = std::make_unique<node>(l.root.get(), nullptr);
   }
 
