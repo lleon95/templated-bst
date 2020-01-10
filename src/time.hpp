@@ -9,6 +9,7 @@
 #pragma once
 #include <chrono>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -18,10 +19,10 @@ typedef std::chrono::high_resolution_clock::time_point time_point_t;
 #define INIT_PROFILER(NAME)                                   \
     profiler (NAME){};
 #define START_PROFILE(NAME, PROFILER, ITER)                   \
-    profile_node NAME = (PROFILER).create(str(NAME));          \
+    profile_node * NAME = (PROFILER).create(str(NAME));          \
     for(size_t i{0}; i < (ITER); ++i) {     
 #define END_PROFILE(NAME)                                     \
-      (NAME).tick();                                          \
+      (NAME)->tick();                                          \
     }
 
 /* Profiler instance */
@@ -42,32 +43,33 @@ public:
     ++counter;
     average /= counter;
     tlast = tnow;
+    std::cout << "Tick " << counter << std::endl;
   }
   friend
   std::ostream& operator<<(std::ostream& os, const profile_node& pn){
-    os << "-- " << pn.name << " --" << "(AVG: " << pn.average << ", IT:" 
-    << pn.average << ")";
+    os << "-- " << pn.name << " --" << " (AVG: " << pn.average << ", IT:" 
+    << pn.counter << ")";
     return os;
   }
 };
 
 class profiler{
-  std::vector<profile_node> profilers;
+  std::vector<std::unique_ptr<profile_node>> profilers;
 public:
   /* Default */
   profiler() {};
   
   /* Create a new instance */
-  profile_node& create(std::string name){
-    profilers.push_back(profile_node(name));
-    return profilers.at(profilers.size()-1);
+  profile_node * create(std::string name){
+    profilers.push_back(std::make_unique<profile_node>(name));
+    return profilers[profilers.size()-1].get();
   }
   /* Print instance */
   friend
   std::ostream& operator<<(std::ostream& os, const profiler& p){
-    os << "Printing profile results: \n"; 
-    for(auto i : p.profilers) {
-      os << i << std::endl;
+    os << "Printing profile results: \n";
+    for(size_t i{0}; i < p.profilers.size(); ++i){
+      os << *(p.profilers[i].get()) << " ";
     }
     return os;
   }

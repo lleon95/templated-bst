@@ -31,17 +31,14 @@ class bst{
     ~node() noexcept = default;
 
     explicit node(const pair_t &p) : pair{p}, left_child{nullptr}, right_child{nullptr} {
-      std::cout << "CConstructor: " << std::get<0>(p) << std::endl;
     };
     explicit node(pair_t &&p) : pair{std::move(p)}, left_child{nullptr}, right_child{nullptr} {
-      std::cout << "MConstructor: " << std::get<0>(p) << std::endl;
     };
     node& operator=(const pair_t &p) {*this.pair = p; return *this;}
     
     explicit node(node * p, node * new_parent) 
       : pair{p->pair}, parent{new_parent}, left_child{nullptr}, right_child{nullptr} 
     {
-      std::cout << "Copy const node" << std::endl;
       if (p->left_child)
       left_child = std::make_unique<node>(p->left_child.get(), this);
       if (p->right_child)
@@ -81,7 +78,6 @@ public:
   bst(bst&& l) noexcept = default;
   
   bst(const bst& l) {
-    std::cout << "Copy const" << std::endl;
     root = std::make_unique<node>(l.root.get(), nullptr);
   }
 
@@ -126,7 +122,6 @@ public:
       return std::make_pair(bin, parent);
     } else {
       auto bin_key = std::get<0>(bin->get()->pair);
-      std::cout << "Key - target: " << bin_key << std::endl;
       if (key < bin_key) {
         return look_up(key, &(bin->get()->left_child), bin->get());
       } else if (key == bin_key) {
@@ -164,7 +159,6 @@ public:
     /* Get the key */
     
     auto target_k = std::get<0>(x);
-    std::cout << "Copy insert " << target_k << std::endl;
     auto elem_lookup = look_up(target_k, &root);
 
     auto bin = std::get<0>(elem_lookup);
@@ -179,7 +173,6 @@ public:
     } 
   }
   std::pair<iterator, bool> insert(pair_t&& x) {
-    std::cout << "Move insert" << std::endl;
     /* Get the key */
     auto target_k = std::get<0>(x);
     auto elem_lookup = look_up(target_k, &root);
@@ -244,20 +237,13 @@ public:
    * @brief Balance
    */
   void balance(){
-    std::cout << "Reordering" << std::endl;
     std::vector<pair_t> buffer{};
     /* Load into a buffer */
     for(auto i : *(this)) {
       buffer.push_back(i);
     }
     /* Start reordering */
-    clear();
-    std::cout << "Buf: ";
-    for (auto i : buffer) {
-      std::cout << std::get<0>(i) << " ";
-    }
-    std::cout << std::endl;
-    
+    clear();    
     
     size_t half = buffer.size()/2;
     size_t quarter = half/2;

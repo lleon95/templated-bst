@@ -21,7 +21,6 @@ int main(){
   std::cout << bst_profiler << std::endl;
 
   auto result = mytree.insert(std::make_pair(50,3));
-  std::cout << std::get<1>(result) << std::endl;
 
   for(int i = 0; i < 20; ++i) {
     int key = rand() % 100;
@@ -30,18 +29,20 @@ int main(){
   }
 
   /* Print the tree */
+  std::cout << "Adding Nodes: ";
   for (auto i : mytree) {
-    std::cout << "Node: " << std::get<0>(i) << std::endl;
+     std::cout << std::get<0>(i) << " ";
   }
+  std::cout << std::endl;
   
 
   /* Look for a key */
   auto elem = mytree.find(16);
   auto end = mytree.end();
   if (elem == end) {
-    std::cout << "Holder: empty" << std::endl;
+    std::cout << "Find value: not found" << std::endl;
   } else {
-    std::cout << "Holder: " << std::get<0>(*elem) << "," << std::get<1>(*elem) << std::endl;
+    std::cout << "Find value: " << std::get<0>(*elem) << "," << std::get<1>(*elem) << std::endl;
   }
 
   /* Test the subscriptor */
@@ -66,16 +67,19 @@ int main(){
     result = mytree.insert(pair);
   }
   /* Print the tree */
+  std::cout << "Adding Nodes: ";
   for (auto i : mytree) {
-    std::cout << "Node: " << std::get<0>(i) << std::endl;
+    std::cout << std::get<0>(i) << " ";
   }
+  std::cout << std::endl;
+
   /* Look for a key */
-  elem = mytree.find(59);
+  elem = mytree.find(35);
   end = mytree.end();
   if (elem == end) {
-    std::cout << "Holder: empty" << std::endl;
+    std::cout << "Find value: not found" << std::endl;
   } else {
-    std::cout << "Holder: " << std::get<0>(*elem) << "," << std::get<1>(*elem) << std::endl;
+    std::cout << "Find value: " << std::get<0>(*elem) << "," << std::get<1>(*elem) << std::endl;
   }
 
   /* Test others */
