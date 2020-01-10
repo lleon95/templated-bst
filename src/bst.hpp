@@ -27,9 +27,7 @@ class bst{
     std::unique_ptr<node> right_child;
 
     node() noexcept = default;
-    ~node() noexcept {
-      std::cout << "Node destroyed" << std::endl;
-    };
+    ~node() noexcept = default;
 
     explicit node(const std::pair<const KT, VT> &p) : pair{p}, left_child{nullptr}, right_child{nullptr} {
       std::cout << "CConstructor: " << std::get<0>(p) << std::endl;
@@ -38,6 +36,15 @@ class bst{
       std::cout << "MConstructor: " << std::get<0>(p) << std::endl;
     };
     node& operator=(const std::pair<const KT, VT> &p) {*this.pair = p; return *this;}
+    
+    explicit node(node * p, node * new_parent) 
+      : pair{p->pair}, left_child{nullptr}, right_child{nullptr}, parent{new_parent} 
+    {
+      if (p->left_child)
+      left_child = std::make_unique<node>(p->left_child.get(), this);
+      if (p->right_child)
+      right_child = std::make_unique<node>(p->right_child.get(), this);
+    }
   };
 
 public:
@@ -71,9 +78,13 @@ public:
 
   bst() noexcept = default;
   bst(bst&& l) noexcept = default;
-  bst& operator=(bst&& l) noexcept = default;
+  
+  explicit bst(const bst& l) {
+    std::cout << "Copy const" << std::endl;
+    root = std::make_unique<node>(l.root.get(), nullptr);
+  }
 
-  bst(const bst& l);
+  bst& operator=(bst&& l) noexcept = default;
   bst& operator=(const bst& l);
 
   /**
