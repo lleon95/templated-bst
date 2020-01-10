@@ -11,16 +11,18 @@
 #include <memory>
 #include <utility>
 #include <unistd.h>
+#include <vector>
 
 template <typename KT, typename VT, typename CMP = std::less<KT>>
 class bst{
+  using pair_t = std::pair<const KT, VT>;
   
   /**
    * @brief Node struct
    * @details This defines the members or leaves of the binary tree
    */
   struct node{
-    std::pair<const KT, VT> pair;
+    pair_t pair;
 
     node * parent = nullptr;
     std::unique_ptr<node> left_child;
@@ -29,17 +31,18 @@ class bst{
     node() noexcept = default;
     ~node() noexcept = default;
 
-    explicit node(const std::pair<const KT, VT> &p) : pair{p}, left_child{nullptr}, right_child{nullptr} {
+    explicit node(const pair_t &p) : pair{p}, left_child{nullptr}, right_child{nullptr} {
       std::cout << "CConstructor: " << std::get<0>(p) << std::endl;
     };
-    explicit node(std::pair<const KT, VT> &&p) : pair{std::move(p)}, left_child{nullptr}, right_child{nullptr} {
+    explicit node(pair_t &&p) : pair{std::move(p)}, left_child{nullptr}, right_child{nullptr} {
       std::cout << "MConstructor: " << std::get<0>(p) << std::endl;
     };
-    node& operator=(const std::pair<const KT, VT> &p) {*this.pair = p; return *this;}
+    node& operator=(const pair_t &p) {*this.pair = p; return *this;}
     
     explicit node(node * p, node * new_parent) 
-      : pair{p->pair}, left_child{nullptr}, right_child{nullptr}, parent{new_parent} 
+      : pair{p->pair}, parent{new_parent}, left_child{nullptr}, right_child{nullptr} 
     {
+      std::cout << "Copy const node" << std::endl;
       if (p->left_child)
       left_child = std::make_unique<node>(p->left_child.get(), this);
       if (p->right_child)
@@ -79,13 +82,17 @@ public:
   bst() noexcept = default;
   bst(bst&& l) noexcept = default;
   
-  explicit bst(const bst& l) {
+  bst(const bst& l) {
     std::cout << "Copy const" << std::endl;
     root = std::make_unique<node>(l.root.get(), nullptr);
   }
 
   bst& operator=(bst&& l) noexcept = default;
-  bst& operator=(const bst& l);
+  
+  bst& operator=(const bst& l) {
+    ~bst();
+    root = std::make_unique<node>(l.root.get(), nullptr);
+  }
 
   /**
    * @brief Iterator class
@@ -94,8 +101,8 @@ public:
   template <typename O>
   class __iterator;
 
-  using iterator = __iterator< std::pair<const KT, VT> >;
-  using const_iterator = __iterator< const std::pair<const KT, VT> >;
+  using iterator = __iterator< pair_t >;
+  using const_iterator = __iterator< const pair_t >;
 
   /**
    * @brief Iterator methods
@@ -155,7 +162,7 @@ public:
    * @details This inserts a new node in case it does not exist. In case it 
    * exist, it won't overwrite the value, but the iterator is returned
    */
-  std::pair<iterator, bool> insert(const std::pair<KT, VT>& x) {
+  std::pair<iterator, bool> insert(const pair_t& x) {
     /* Get the key */
     std::cout << "Copy insert" << std::endl;
     auto target_k = std::get<0>(x);
@@ -172,7 +179,7 @@ public:
       return std::make_pair(iterator{bin->get()}, false);
     } 
   }
-  std::pair<iterator, bool> insert(std::pair<KT, VT>&& x) {
+  std::pair<iterator, bool> insert(pair_t&& x) {
     std::cout << "Move insert" << std::endl;
     /* Get the key */
     auto target_k = std::get<0>(x);
@@ -231,7 +238,27 @@ public:
    */
   template< class ... Types >
   std::pair<iterator, bool> emplace(Types&&... args){
-    return insert(std::pair<KT, VT>{std::forward<Types>(args)...});
+    return insert(pair_t{std::forward<Types>(args)...});
+  }
+
+  /**
+   * @brief Balance
+   */
+  void balance(){
+    std::cout << "Reordering" << std::endl;
+    std::vector<pair_t> buffer{};
+    /* Load into a buffer */
+    for(auto i : *(this)) {
+      buffer.push_back(i);
+    }
+    /* Start reordering */
+    this->~bst();
+    size_t half = buffer.size()/2;
+    insert(buffer.at(half));
+    for (size_t i{1}; i <= half; ++i) {
+      if (i != half) insert(buffer.at(half + i));
+      insert(buffer.at(half - i));
+    }
   }
 
 };

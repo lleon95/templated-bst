@@ -42,8 +42,12 @@ int main(){
   std::cout << "Ostream \n" << mytree << std::endl;
 
   /* Testing move and copy semantics */
-  //bst<int, int> mytree_2cpassign = mytree;
+  bst<int, int> mytree_2cpassign = mytree;
   bst<int, int> mytree_2cpconst{mytree};
+  bst<int, int> mytree_2cpconstmv{std::move(mytree_2cpconst)};
+  bst<int, int> mytree_2mvassign = std::move(mytree_2cpassign);
+
+  mytree_2mvassign.balance();
 
   /* Clear */
   mytree.clear();
@@ -54,8 +58,8 @@ int main(){
 
   /* Test others */
   std::cout << "Ostream mytree \n" << mytree << std::endl;
-  //std::cout << "Ostream mytree_2cpassign \n" << mytree_2cpassign << std::endl;
-  std::cout << "Ostream mytree_2cpconst \n" << mytree_2cpconst << std::endl;
+  std::cout << "Ostream mytree_2cpassign \n" << mytree_2mvassign << std::endl;
+  std::cout << "Ostream mytree_2cpconst \n" << mytree_2cpconstmv << std::endl;
 
   return 0;
 }
