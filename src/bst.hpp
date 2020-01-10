@@ -253,11 +253,25 @@ public:
     }
     /* Start reordering */
     this->~bst();
+    
     size_t half = buffer.size()/2;
+    size_t quarter = half/2;
+
     insert(buffer.at(half));
-    for (size_t i{1}; i <= half; ++i) {
-      if (i != half) insert(buffer.at(half + i));
-      insert(buffer.at(half - i));
+    insert(buffer.at(half + quarter));
+    insert(buffer.at(half - quarter));
+
+    for (size_t i{1}; i <= quarter; ++i) {
+      size_t leftm_left_idx = quarter - i;
+      size_t leftm_right_idx = quarter + i;
+      size_t rightm_left_idx = half + quarter - i;
+      size_t rightm_right_idx = half + quarter + i;
+      if(leftm_right_idx != half)
+        insert(buffer.at(leftm_right_idx));
+      else if(rightm_right_idx != buffer.size())
+        insert(buffer.at(rightm_right_idx));
+      insert(buffer.at(leftm_left_idx));
+      insert(buffer.at(rightm_left_idx));
     }
   }
 
