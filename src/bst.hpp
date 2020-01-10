@@ -206,7 +206,7 @@ public:
    * @brief Subscription operator
    * @details
    */
-  const VT& operator[](const KT& x) const {
+  VT& operator[](const KT& x) {
     /* Use insert with an default value */
     auto element = std::make_pair(x, VT{});
     auto insert_result = insert(element);
