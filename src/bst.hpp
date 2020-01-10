@@ -274,7 +274,7 @@ public:
       
       if(leftm_right_idx != half)
         insert(buffer.at(leftm_right_idx));
-      else if(rightm_right_idx != buffer.size())
+      if(rightm_right_idx != buffer.size())
         insert(buffer.at(rightm_right_idx));
 
       insert(buffer.at(leftm_left_idx));

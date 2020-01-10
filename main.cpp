@@ -12,7 +12,7 @@ int main(){
   auto result = mytree.insert(std::make_pair(50,3));
   std::cout << std::get<1>(result) << std::endl;
 
-  for(int i = 0; i < 10; ++i) {
+  for(int i = 0; i < 20; ++i) {
     int key = rand() % 100;
     pair = std::make_pair(key,3);
     result = mytree.insert(pair);
