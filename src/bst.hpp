@@ -10,7 +10,6 @@
 #include <functional>
 #include <memory>
 #include <utility>
-#include <unistd.h>
 #include <vector>
 
 template <typename KT, typename VT, typename CMP = std::less<KT>>

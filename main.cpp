@@ -1,13 +1,24 @@
 #include <cstdlib>
 #include <functional>
 #include <iostream>
+#include <unistd.h>
 #include <utility>
 
+
 #include "src/bst.hpp"
+#include "src/time.hpp"
 
 int main(){
   bst<int, int> mytree;
   auto pair = std::make_pair(50,3);
+
+  INIT_PROFILER(bst_profiler);
+
+  START_PROFILE(dummy, bst_profiler, 10)
+    usleep(1000);
+  END_PROFILE(dummy)
+
+  std::cout << bst_profiler << std::endl;
 
   auto result = mytree.insert(std::make_pair(50,3));
   std::cout << std::get<1>(result) << std::endl;
