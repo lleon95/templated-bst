@@ -68,7 +68,7 @@ public:
   std::ostream& operator<<(std::ostream& os, const profiler& p){
     os << "Printing profile results: \n";
     for(size_t i{0}; i < p.profilers.size(); ++i){
-      os << *(p.profilers[i].get()) << " ";
+      os << *(p.profilers[i].get()) << "\n";
     }
     return os;
   }
