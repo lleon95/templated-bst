@@ -18,6 +18,8 @@
 typedef std::chrono::high_resolution_clock::time_point time_point_t;
 #define INIT_PROFILER(NAME)                                   \
     profiler (NAME){};
+#define GET_PROFILE_INSTANCE(NAME, PROFILER)  \
+    profile_node * NAME = (PROFILER).create(str(NAME));
 #define START_PROFILE(NAME, PROFILER, ITER)                   \
     profile_node * NAME = (PROFILER).create(str(NAME));          \
     for(size_t i{0}; i < (ITER); ++i) {     
@@ -43,6 +45,9 @@ public:
     ++counter;
     average /= counter;
     tlast = tnow;
+  }
+  void reset(){
+    tlast = std::chrono::high_resolution_clock::now();
   }
   friend
   std::ostream& operator<<(std::ostream& os, const profile_node& pn){
