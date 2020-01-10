@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <utility>
 
-#define ENABLE_VERBOSE
+//#define ENABLE_VERBOSE
 
 #include "src/bst.hpp"
 #include "src/time.hpp"
@@ -20,30 +20,37 @@ int main(){
   START_PROFILE(insertion_copy, bst_profiler, 10)
   int key = rand() % 100;
   auto pair = std::make_pair(key,key);
-  auto result = mytree1.insert(pair);
+  
 #ifdef ENABLE_VERBOSE
+  auto result = mytree1.insert(pair);
   std::cout << "Inserting -> " << key << " Result: "
   << std::get<1>(result) << std::endl;
+#else
+  mytree1.insert(pair);
 #endif
   END_PROFILE(insertion_copy)
 
   std::cout << "-- Insertion: move" << std::endl;
   START_PROFILE(insertion_move, bst_profiler, 10)
   int key = rand() % 100;
-  auto result = mytree2.insert(std::make_pair(key,key));
 #ifdef ENABLE_VERBOSE
+  auto result = mytree2.insert(std::make_pair(key,key));
   std::cout << "Inserting -> " << key << " Result: "
   << std::get<1>(result) << std::endl;
+#else
+  mytree2.insert(std::make_pair(key,key));
 #endif
   END_PROFILE(insertion_move)
 
   std::cout << "-- Emplace" << std::endl;
   START_PROFILE(emplace, bst_profiler, 10)
   int key = rand() % 100;
-  auto result = mytree.emplace(key,key);
 #ifdef ENABLE_VERBOSE
+  auto result = mytree.emplace(key,key);
   std::cout << "Emplacing -> " << key << " Result: "
   << std::get<1>(result) << std::endl;
+#else
+  mytree.emplace(key,key);
 #endif
   END_PROFILE(emplace)
   
@@ -55,10 +62,13 @@ int main(){
   std::cout << "-- Find" << std::endl;
   START_PROFILE(find, bst_profiler, 10)
   int key = rand() % 100;
-  auto it = mytree1.find(key);
+  
 #ifdef ENABLE_VERBOSE
+  auto it = mytree1.find(key);
   std::cout << "Finding -> " << key << " Result: "
   << (it == mytree.end()) << std::endl;
+#else
+  mytree1.find(key);
 #endif
   END_PROFILE(find)
 
@@ -83,10 +93,12 @@ int main(){
   std::cout << "-- Subscription: retrieve" << std::endl;
   START_PROFILE(suscription_retrieve, bst_profiler, 10)
   int key = rand() % 100;
-  auto result = mytree[key];
 #ifdef ENABLE_VERBOSE
+  auto result = mytree[key];
   std::cout << "Retrieving -> " << key << " Result: "
   << result << std::endl;
+#else
+  mytree[key];
 #endif
   END_PROFILE(suscription_retrieve)
 
@@ -101,20 +113,18 @@ int main(){
   END_PROFILE(subscription_setting)
 
   const int iter_semantics = 10;
-/*
+
   std::cout << "-- Copy semantics: assignment" << std::endl;
-  
-  std::vector<bst<int,int>> trees;
 
   START_PROFILE(copy_assignmet, bst_profiler, iter_semantics)
-  trees[i] = ((i % 2 == 0) ? mytree : mytree1);
+  bst<int,int> tree_test = ((i % 2 == 0) ? mytree : mytree1);
 #ifdef ENABLE_VERBOSE
   std::cout << "Copying -> Tree " << (i % 2) << "\n" <<
   ((i % 2 == 0) ? mytree : mytree1) <<std::endl;
-  std::cout << "Copied: " << trees[i] << std::endl;
+  std::cout << "Copied: " << tree_test << std::endl;
 #endif
   END_PROFILE(copy_assignmet)
-*/
+
   std::cout << "-- Copy semantics: construction" << std::endl;
   START_PROFILE(copy_construction, bst_profiler, iter_semantics)
   if (i % 2 == 0) bst<int,int> tree_test{mytree};
