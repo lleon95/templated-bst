@@ -43,7 +43,6 @@ public:
     ++counter;
     average /= counter;
     tlast = tnow;
-    std::cout << "Tick " << counter << std::endl;
   }
   friend
   std::ostream& operator<<(std::ostream& os, const profile_node& pn){
