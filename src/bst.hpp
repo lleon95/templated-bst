@@ -15,6 +15,10 @@
 template <typename KT, typename VT, typename CMP = std::less<KT>>
 class bst{
   using pair_t = std::pair<const KT, VT>;
+  /**
+   * @brief Operator member
+   */
+  CMP op();
   
   /**
    * @brief Node struct
@@ -122,7 +126,7 @@ public:
       return std::make_pair(bin, parent);
     } else {
       auto bin_key = std::get<0>(bin->get()->pair);
-      if (key < bin_key) {
+      if (op(key, bin_key)) {
         return look_up(key, &(bin->get()->left_child), bin->get());
       } else if (key == bin_key) {
         return std::make_pair(bin, parent);
