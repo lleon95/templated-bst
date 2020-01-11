@@ -23,29 +23,7 @@ int main(){
   benchmark< std::map<int, int> >();
   return 0;
 }
-/*
-void benchmark()
-{
-  INIT_PROFILER(map_profiler);
-  std::map<int, int> mytree, mytree1, mytree2;
 
-  std::cout << "-- Insertion: copy" << std::endl;
-  START_PROFILE(insertion_copy, map_profiler, 10)
-  int key = rand() % 100;
-  auto pair = std::make_pair(key,key);
-  
-#ifdef ENABLE_VERBOSE
-  auto result = mytree1.insert(pair);
-  std::cout << "Inserting -> " << key << " Result: "
-  << std::get<1>(result) << std::endl;
-#else
-  mytree1.insert(pair);
-#endif
-  END_PROFILE(insertion_copy)
-
-  std::cout << "*** std::map ***" <<  map_profiler << std::endl;
-}
-*/
 template <typename T>
 void benchmark()
 {
