@@ -2,6 +2,7 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <unistd.h>
 #include <utility>
@@ -14,14 +15,26 @@
 #define ENABLE_PROFILE
 
 typedef bst<int, int>  bst_t;
-const int number_elements = 100;
-const int number_iters = 100;
-const int number_iter_semantics = 100;
+unsigned int number_elements = 100;
+unsigned int number_iters = 100;
+unsigned int number_iter_semantics = 100;
 
 template <typename T>
 void benchmark();
 
-int main(){
+int main(int argc, char ** argv){
+  if (argc >= 2) {
+    std::istringstream incoming{argv[1]};
+    incoming >> number_elements;
+  }
+  if (argc >= 3) {
+    std::istringstream incoming{argv[2]};
+    incoming >> number_iters;
+  }
+  if (argc >= 4) {
+    std::istringstream incoming{argv[3]};
+    incoming >> number_iter_semantics;
+  }
 #ifdef ENABLE_PROFILE
 
   std::cout << "*** Analysing BST ***" << std::endl;
@@ -159,14 +172,14 @@ void benchmark()
 
   std::cout << "-- Copy semantics: assignment" << std::endl;
 
-  START_PROFILE(copy_assignmet, bst_profiler, number_iter_semantics)
+  START_PROFILE(copy_assignment, bst_profiler, number_iter_semantics)
   T tree_test = ((i % 2 == 0) ? mytree : mytree1);
 #ifdef ENABLE_VERBOSE
   std::cout << "Copying -> Tree " << (i % 2) << "\n" <<
   ((i % 2 == 0) ? mytree : mytree1) <<std::endl;
   std::cout << "Copied: " << tree_test << std::endl;
 #endif
-  END_PROFILE(copy_assignmet)
+  END_PROFILE(copy_assignment)
 
   std::cout << "-- Copy semantics: construction" << std::endl;
   START_PROFILE(copy_construction, bst_profiler, number_iter_semantics)
@@ -181,12 +194,12 @@ void benchmark()
 
   std::cout << "-- Move semantics: assignment" << std::endl;
   GET_PROFILE_INSTANCE(move_assignment, bst_profiler)
-  for(auto i = 0; i < 20; i++){
+  for(unsigned int i = 0; i < number_iter_semantics; i++){
 #ifdef ENABLE_VERBOSE
     std::cout << "Creating new tree ... " << std::endl;
 #endif
     T test;
-    for(int i = 0; i < 20; ++i) {
+    for(unsigned int i = 0; i < number_elements; ++i) {
       int key = rand() % 100;
       test.insert(std::make_pair(key,key));
     }
@@ -204,12 +217,12 @@ void benchmark()
 
   std::cout << "-- Move semantics: construction" << std::endl;
   GET_PROFILE_INSTANCE(move_construction, bst_profiler)
-  for(auto i = 0; i < 20; i++){
+  for(unsigned int i = 0; i < number_iter_semantics; i++){
 #ifdef ENABLE_VERBOSE
     std::cout << "Creating new tree ... " << std::endl;
 #endif
     T test;
-    for(int i = 0; i < 20; ++i) {
+    for(unsigned i = 0; i < number_elements; ++i) {
       int key = rand() % 100;
       test.insert(std::make_pair(key,key));
     }
