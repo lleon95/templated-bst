@@ -56,7 +56,7 @@ public:
    * @brief Clear
    */
   void clear(){
-    this->~bst();
+    root.reset();
   }
 
   /**
