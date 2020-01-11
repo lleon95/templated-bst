@@ -18,7 +18,7 @@ class bst{
   /**
    * @brief Operator member
    */
-  CMP op();
+  CMP op = CMP{};
   
   /**
    * @brief Node struct
@@ -128,7 +128,7 @@ public:
       auto bin_key = std::get<0>(bin->get()->pair);
       if (op(key, bin_key)) {
         return look_up(key, &(bin->get()->left_child), bin->get());
-      } else if (key == bin_key) {
+      } else if (!op(key, bin_key) && !op(bin_key, key)) {
         return std::make_pair(bin, parent);
       } else {
         return look_up(key, &(bin->get()->right_child), bin->get());
