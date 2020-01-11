@@ -10,9 +10,11 @@
 #include "src/time.hpp"
 
 /* Switches */
-// #define ENABLE_VERBOSE
+/* #define ENABLE_VERBOSE */ /* Enable this when you want to see the results */
+#define ENABLE_PROFILE
+
 typedef bst<int, int>  bst_t;
-const int number_elements = 1000;
+const int number_elements = 100;
 const int number_iters = 100;
 const int number_iter_semantics = 100;
 
@@ -20,11 +22,33 @@ template <typename T>
 void benchmark();
 
 int main(){
+#ifdef ENABLE_PROFILE
+
   std::cout << "*** Analysing BST ***" << std::endl;
   benchmark< bst_t >();
 #ifndef ENABLE_VERBOSE
   std::cout << "*** Analysing std::map ***" << std::endl;
   benchmark< std::map<int, int> >();
+#endif
+
+#else
+  bst_t mytree;
+  /* Create a tree */
+  std::cout << "Creating tree: ";
+  for (size_t i{0}; i < number_elements; ++i){
+    int key = rand() % 100;
+    auto pair = std::make_pair(key,key);
+    std::cout << key << " ";
+    mytree.insert(pair);
+  }
+  std::cout << std::endl;
+  /* Print */
+  std::cout << mytree << std::endl;
+  bst_t mytree2 = mytree1;
+  /* Print */
+  mytree2.balance();
+  std::cout << mytree2 << std::endl;
+
 #endif
   return 0;
 }
