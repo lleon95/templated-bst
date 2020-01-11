@@ -208,7 +208,6 @@ public:
 
   /**
    * @brief Subscription operator
-   * @details
    */
   VT& operator[](const KT& x) {
     /* Use insert with an default value */
@@ -239,6 +238,7 @@ public:
 
   /**
    * @brief Balance
+   * @details A very naive implementation
    */
   void balance(){
     std::vector<pair_t> buffer{};
