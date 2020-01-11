@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -g -std=c++14 -O0
+CXXFLAGS = -Wall -Wextra -g -std=c++17 -O3
 
 SRC = $(wildcard *.[ch]pp)
 
@@ -23,6 +23,9 @@ format: $(SRC)
 	@clang-format -i $^ 2>/dev/null || echo "Please install clang-format to run this command"
 
 .PHONY: format
+
+mem-check:
+	valgrind --leak-check=yes main.x
 
 clean:
 	rm -f $(EXE) *~

@@ -56,22 +56,22 @@ public:
    * @brief Clear
    */
   void clear(){
-    this->~bst();
+    root.reset();
   }
 
   /**
    * @brief Auxiliar function to walk into the tree
-   * @details This method will get the lower leave from the current node
+   * @details This method will get the lower leaf from the current node
    * This will be used to get the next element, when executing this method
    * from the right child of the current node.
    */
-  static node * get_lower(node * leave) {
-    if(!leave) return nullptr;
+  static node * get_lower(node * leaf) {
+    if(!leaf) return nullptr;
 
-    if(leave->left_child) {
-      return get_lower(leave->left_child.get());
+    if(leaf->left_child) {
+      return get_lower(leaf->left_child.get());
     }
-    return leave;
+    return leaf;
   }
 
   bst() noexcept = default;
@@ -242,6 +242,10 @@ public:
     for(auto i : *(this)) {
       buffer.push_back(i);
     }
+    
+    /* Abort if no elements */
+    if(buffer.size() == 0) return;
+    
     /* Start reordering */
     clear();    
     
@@ -297,7 +301,7 @@ public:
     node * parent = current->parent;
     /* Root case */
     if (!current) goto RETURN_ITER;
-    /* It is a leave */
+    /* It is a leaf */
     if (!current->left_child.get() && !current->right_child.get()) {
       /* Root case */
       if (!parent) {
@@ -305,12 +309,12 @@ public:
         past = current;
         goto RETURN_ITER;
       }
-      /* is it a left leave - just go to parent */
+      /* is it a left leaf - just go to parent */
       if (parent->left_child.get() == current) {
         past = current;
         current = current->parent;
       }
-      /* is it a right leave - go until not being a right leave */ 
+      /* is it a right leaf - go until not being a right leaf */ 
       else {
         while(parent->right_child.get() == current) {
           current = parent;
