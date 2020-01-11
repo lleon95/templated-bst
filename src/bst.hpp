@@ -208,7 +208,6 @@ public:
 
   /**
    * @brief Subscription operator
-   * @details
    */
   VT& operator[](const KT& x) {
     /* Use insert with an default value */
@@ -239,6 +238,7 @@ public:
 
   /**
    * @brief Balance
+   * @details A very naive implementation
    */
   void balance(){
     std::vector<pair_t> buffer{};
@@ -302,68 +302,23 @@ public:
   /* Pre-increment */
   __iterator& operator++() noexcept 
   { 
-    node * parent = current->parent;
-    /* Root case */
-    if (!current) goto RETURN_ITER;
-    /* It is a leaf */
-    if (!current->left_child.get() && !current->right_child.get()) {
-      /* Root case */
-      if (!parent) {
-        current = nullptr;
-        past = current;
-        goto RETURN_ITER;
-      }
-      /* is it a left leaf - just go to parent */
-      if (parent->left_child.get() == current) {
-        past = current;
+    if (current) {
+      if (current->right_child) {
+        current = bst<KT, VT, CMP>::get_lower(current->right_child.get());
+      } else {
+        /* Climb to the main parent */
+        node * parent = current->parent;
+        if (parent) {
+          node * right_child = parent->right_child.get();
+          while(current == right_child) {
+            current = current->parent;
+            parent = current->parent;
+            if (parent) right_child = parent->right_child.get();
+          }
+        }
         current = current->parent;
       }
-      /* is it a right leaf - go until not being a right leaf */ 
-      else {
-        while(parent->right_child.get() == current) {
-          current = parent;
-          parent = current->parent;
-          if (parent == nullptr) {
-            /* End of tree */
-            break;
-          }
-        }
-        if(parent != nullptr) {
-          past = current;
-          current = parent;
-        } else {
-          current = nullptr;
-        }
-      } 
-    } else {
-      if (past == current->left_child.get() || !current->left_child.get()) {
-        /* Go right */
-        if (current->right_child.get()) {
-          past = current;
-          current = bst<KT, VT, CMP>::get_lower(current->right_child.get());
-        } else {
-          while(parent->right_child.get() == current) {
-            current = parent;
-            parent = current->parent;
-            if (parent == nullptr) {
-              /* End of tree */
-              break;
-            }
-          }
-          if(parent != nullptr) {
-            past = current;
-            current = parent;
-          } else {
-            current = nullptr;
-          }
-        }
-        
-      } else {
-        past = nullptr;
-        current = bst<KT, VT, CMP>::get_lower(current);
-      }
     }
-RETURN_ITER:
     return *this;
   }
 
