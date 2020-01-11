@@ -1,6 +1,8 @@
 #include <cstdlib>
 #include <functional>
 #include <iostream>
+#include <map>
+#include <string>
 #include <unistd.h>
 #include <utility>
 
@@ -9,11 +11,47 @@
 #include "src/bst.hpp"
 #include "src/time.hpp"
 
-int main(){
-  INIT_PROFILER(bst_profiler);
+template <typename T, bool EB = true>
+void benchmark();
 
-  /* Performing operations with custom_made bst */
-  bst<int, int> mytree, mytree1, mytree2;
+int main(){
+  std::cout << "*** Analysing BST ***" << std::endl;
+  benchmark< bst<int, int> >();
+  std::cout << "*** Analysing std::map ***" << std::endl;
+  benchmark< std::map<int, int>, false >();
+  return 0;
+}
+/*
+void benchmark()
+{
+  INIT_PROFILER(map_profiler);
+  std::map<int, int> mytree, mytree1, mytree2;
+
+  std::cout << "-- Insertion: copy" << std::endl;
+  START_PROFILE(insertion_copy, map_profiler, 10)
+  int key = rand() % 100;
+  auto pair = std::make_pair(key,key);
+  
+#ifdef ENABLE_VERBOSE
+  auto result = mytree1.insert(pair);
+  std::cout << "Inserting -> " << key << " Result: "
+  << std::get<1>(result) << std::endl;
+#else
+  mytree1.insert(pair);
+#endif
+  END_PROFILE(insertion_copy)
+
+  std::cout << "*** std::map ***" <<  map_profiler << std::endl;
+}
+*/
+template <typename T, bool EB = true>
+void benchmark()
+{
+  /*
+    Perform benchmark of the Custom BST
+  */
+  INIT_PROFILER(bst_profiler);
+  T mytree, mytree1, mytree2;
 
   /* Insertion */
   std::cout << "-- Insertion: copy" << std::endl;
@@ -72,24 +110,6 @@ int main(){
 #endif
   END_PROFILE(find)
 
-  std::cout << "-- Balance" << std::endl;
-  GET_PROFILE_INSTANCE(balancing, bst_profiler)
-  for(auto i = 0; i < 20; i++){
-#ifdef ENABLE_VERBOSE
-    std::cout << "Creating new tree ... " << std::endl;
-#endif
-    for(int i = 0; i < 20; ++i) {
-      int key = rand() % 100;
-      mytree2.insert(std::make_pair(key,key));
-    }
-#ifdef ENABLE_VERBOSE
-    std::cout << "Balancing tree ... " << std::endl;
-#endif
-    balancing->reset();
-    mytree2.balance();
-    balancing->tick();
-  }
-
   std::cout << "-- Subscription: retrieve" << std::endl;
   START_PROFILE(suscription_retrieve, bst_profiler, 10)
   int key = rand() % 100;
@@ -117,7 +137,7 @@ int main(){
   std::cout << "-- Copy semantics: assignment" << std::endl;
 
   START_PROFILE(copy_assignmet, bst_profiler, iter_semantics)
-  bst<int,int> tree_test = ((i % 2 == 0) ? mytree : mytree1);
+  T tree_test = ((i % 2 == 0) ? mytree : mytree1);
 #ifdef ENABLE_VERBOSE
   std::cout << "Copying -> Tree " << (i % 2) << "\n" <<
   ((i % 2 == 0) ? mytree : mytree1) <<std::endl;
@@ -127,8 +147,8 @@ int main(){
 
   std::cout << "-- Copy semantics: construction" << std::endl;
   START_PROFILE(copy_construction, bst_profiler, iter_semantics)
-  if (i % 2 == 0) bst<int,int> tree_test{mytree};
-  if (i % 2 != 0) bst<int,int> tree_test{mytree1};
+  if (i % 2 == 0) T tree_test{mytree};
+  if (i % 2 != 0) T tree_test{mytree1};
   
 #ifdef ENABLE_VERBOSE
   std::cout << "Copying -> Tree " << (i % 2) << "\n"
@@ -142,7 +162,7 @@ int main(){
 #ifdef ENABLE_VERBOSE
     std::cout << "Creating new tree ... " << std::endl;
 #endif
-    bst<int,int> test;
+    T test;
     for(int i = 0; i < 20; ++i) {
       int key = rand() % 100;
       test.insert(std::make_pair(key,key));
@@ -165,7 +185,7 @@ int main(){
 #ifdef ENABLE_VERBOSE
     std::cout << "Creating new tree ... " << std::endl;
 #endif
-    bst<int,int> test;
+    T test;
     for(int i = 0; i < 20; ++i) {
       int key = rand() % 100;
       test.insert(std::make_pair(key,key));
@@ -175,13 +195,12 @@ int main(){
     std::cout << "Original: " << test << std::endl;
 #endif
     move_construction->reset();
-    bst<int,int> test_mv{std::move(test)};
+    T test_mv{std::move(test)};
     move_construction->tick();
 #ifdef ENABLE_VERBOSE
     std::cout << "Moved: " << test_mv << std::endl;
 #endif
   }
   
-  std::cout << bst_profiler << std::endl;
-  return 0;
+  std::cout << "*** Results ***\n" << bst_profiler << std::endl;
 }
