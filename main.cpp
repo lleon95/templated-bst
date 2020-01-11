@@ -6,12 +6,15 @@
 #include <unistd.h>
 #include <utility>
 
-//#define ENABLE_VERBOSE
-
 #include "src/bst.hpp"
 #include "src/time.hpp"
 
+/* Switches */
+// #define ENABLE_VERBOSE
 typedef bst<int, int>  bst_t;
+const int number_elements = 1000;
+const int number_iters = 100;
+const int number_iter_semantics = 100;
 
 template <typename T>
 void benchmark();
@@ -19,8 +22,10 @@ void benchmark();
 int main(){
   std::cout << "*** Analysing BST ***" << std::endl;
   benchmark< bst_t >();
+#ifndef ENABLE_VERBOSE
   std::cout << "*** Analysing std::map ***" << std::endl;
   benchmark< std::map<int, int> >();
+#endif
   return 0;
 }
 
@@ -35,7 +40,7 @@ void benchmark()
 
   /* Insertion */
   std::cout << "-- Insertion: copy" << std::endl;
-  START_PROFILE(insertion_copy, bst_profiler, 10)
+  START_PROFILE(insertion_copy, bst_profiler, number_elements)
   int key = rand() % 100;
   auto pair = std::make_pair(key,key);
   
@@ -49,7 +54,7 @@ void benchmark()
   END_PROFILE(insertion_copy)
 
   std::cout << "-- Insertion: move" << std::endl;
-  START_PROFILE(insertion_move, bst_profiler, 10)
+  START_PROFILE(insertion_move, bst_profiler, number_elements)
   int key = rand() % 100;
 #ifdef ENABLE_VERBOSE
   auto result = mytree2.insert(std::make_pair(key,key));
@@ -61,7 +66,7 @@ void benchmark()
   END_PROFILE(insertion_move)
 
   std::cout << "-- Emplace" << std::endl;
-  START_PROFILE(emplace, bst_profiler, 10)
+  START_PROFILE(emplace, bst_profiler, number_elements)
   int key = rand() % 100;
 #ifdef ENABLE_VERBOSE
   auto result = mytree.emplace(key,key);
@@ -73,12 +78,12 @@ void benchmark()
   END_PROFILE(emplace)
   
   std::cout << "-- Clear" << std::endl;
-  START_PROFILE(clear, bst_profiler, 10)
+  START_PROFILE(clear, bst_profiler, number_iters)
   mytree2.clear();
   END_PROFILE(clear)
 
   std::cout << "-- Find unbalanced" << std::endl;
-  START_PROFILE(find_unbalanced, bst_profiler, 10)
+  START_PROFILE(find_unbalanced, bst_profiler, number_iters)
   int key = rand() % 100;
   
 #ifdef ENABLE_VERBOSE
@@ -93,7 +98,7 @@ void benchmark()
   if constexpr(std::is_same_v<T, bst_t>){
     std::cout << "-- Find balanced" << std::endl;
     mytree1.balance();
-    START_PROFILE(find_balanced, bst_profiler, 10)
+    START_PROFILE(find_balanced, bst_profiler, number_iters)
     int key = rand() % 100;
   
 #ifdef ENABLE_VERBOSE
@@ -107,7 +112,7 @@ void benchmark()
   }
 
   std::cout << "-- Subscription: retrieve" << std::endl;
-  START_PROFILE(suscription_retrieve, bst_profiler, 10)
+  START_PROFILE(suscription_retrieve, bst_profiler, number_iters)
   int key = rand() % 100;
 #ifdef ENABLE_VERBOSE
   auto result = mytree[key];
@@ -119,7 +124,7 @@ void benchmark()
   END_PROFILE(suscription_retrieve)
 
   std::cout << "-- Subscription: setting" << std::endl;
-  START_PROFILE(subscription_setting, bst_profiler, 10)
+  START_PROFILE(subscription_setting, bst_profiler, number_iters)
   int key = rand() % 100;
   mytree[key] = key;
 #ifdef ENABLE_VERBOSE
@@ -128,11 +133,9 @@ void benchmark()
 #endif
   END_PROFILE(subscription_setting)
 
-  const int iter_semantics = 10;
-
   std::cout << "-- Copy semantics: assignment" << std::endl;
 
-  START_PROFILE(copy_assignmet, bst_profiler, iter_semantics)
+  START_PROFILE(copy_assignmet, bst_profiler, number_iter_semantics)
   T tree_test = ((i % 2 == 0) ? mytree : mytree1);
 #ifdef ENABLE_VERBOSE
   std::cout << "Copying -> Tree " << (i % 2) << "\n" <<
@@ -142,7 +145,7 @@ void benchmark()
   END_PROFILE(copy_assignmet)
 
   std::cout << "-- Copy semantics: construction" << std::endl;
-  START_PROFILE(copy_construction, bst_profiler, iter_semantics)
+  START_PROFILE(copy_construction, bst_profiler, number_iter_semantics)
   if (i % 2 == 0) T tree_test{mytree};
   if (i % 2 != 0) T tree_test{mytree1};
   
