@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -g -std=c++14 -O3
+CXXFLAGS = -Wall -Wextra -g -std=c++17 -O3
 
 SRC = $(wildcard *.[ch]pp)
 
