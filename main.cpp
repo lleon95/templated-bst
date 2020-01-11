@@ -11,14 +11,16 @@
 #include "src/bst.hpp"
 #include "src/time.hpp"
 
-template <typename T, bool EB = true>
+typedef bst<int, int>  bst_t;
+
+template <typename T>
 void benchmark();
 
 int main(){
   std::cout << "*** Analysing BST ***" << std::endl;
-  benchmark< bst<int, int> >();
+  benchmark< bst_t >();
   std::cout << "*** Analysing std::map ***" << std::endl;
-  benchmark< std::map<int, int>, false >();
+  benchmark< std::map<int, int> >();
   return 0;
 }
 /*
@@ -44,7 +46,7 @@ void benchmark()
   std::cout << "*** std::map ***" <<  map_profiler << std::endl;
 }
 */
-template <typename T, bool EB = true>
+template <typename T>
 void benchmark()
 {
   /*
@@ -97,8 +99,8 @@ void benchmark()
   mytree2.clear();
   END_PROFILE(clear)
 
-  std::cout << "-- Find" << std::endl;
-  START_PROFILE(find, bst_profiler, 10)
+  std::cout << "-- Find unbalanced" << std::endl;
+  START_PROFILE(find_unbalanced, bst_profiler, 10)
   int key = rand() % 100;
   
 #ifdef ENABLE_VERBOSE
@@ -108,7 +110,23 @@ void benchmark()
 #else
   mytree1.find(key);
 #endif
-  END_PROFILE(find)
+  END_PROFILE(find_unbalanced)
+
+  if constexpr(std::is_same_v<T, bst_t>){
+    std::cout << "-- Find balanced" << std::endl;
+    mytree1.balance();
+    START_PROFILE(find_balanced, bst_profiler, 10)
+    int key = rand() % 100;
+  
+#ifdef ENABLE_VERBOSE
+    auto it = mytree1.find(key);
+    std::cout << "Finding -> " << key << " Result: "
+    << (it == mytree1.end()) << std::endl;
+#else
+    mytree1.find(key);
+#endif
+    END_PROFILE(find_balanced)
+  }
 
   std::cout << "-- Subscription: retrieve" << std::endl;
   START_PROFILE(suscription_retrieve, bst_profiler, 10)
