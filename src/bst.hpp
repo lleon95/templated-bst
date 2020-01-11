@@ -242,6 +242,10 @@ public:
     for(auto i : *(this)) {
       buffer.push_back(i);
     }
+    
+    /* Abort if no elements */
+    if(buffer.size() == 0) return;
+    
     /* Start reordering */
     clear();    
     
