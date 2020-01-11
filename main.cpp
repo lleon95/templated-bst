@@ -57,10 +57,16 @@ int main(int argc, char ** argv){
   std::cout << std::endl;
   /* Print */
   std::cout << mytree << std::endl;
-  bst_t mytree2 = mytree1;
+  bst_t mytree2 = mytree;
   /* Print */
   mytree2.balance();
   std::cout << mytree2 << std::endl;
+
+  INIT_PROFILER(bst_profiler);
+  START_PROFILE(last, bst_profiler, number_elements)
+  usleep(1000000);
+  END_PROFILE(last)
+  std::cout << bst_profiler << std::endl;
 
 #endif
   return 0;
