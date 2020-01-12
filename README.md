@@ -47,7 +47,7 @@ make mem-check
 
 The code was run on a machine with the following characteristics:
 
-* gcc version 7.4.0
+* gcc version 7.4.0 (Support for C++17 is required)
 * Ubuntu 18.04: Linux 5.0.0-37-generic
 * CPU 2.3GHz Core i3 2nd Generation - 8GB RAM
 
