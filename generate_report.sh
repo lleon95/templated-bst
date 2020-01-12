@@ -22,3 +22,7 @@ do
   echo "$i,$RESULT" >> reports/report_map.csv
   rm reports/report_${i}.txt
 done
+
+# Change "," by spaces
+sed -i 's/,/\ /g' reports/report_bst.csv
+sed -i 's/,/\ /g' reports/report_map.csv
