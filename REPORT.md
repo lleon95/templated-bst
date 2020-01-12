@@ -16,7 +16,7 @@ How your tree compares with `std::map`?
 This report illustrates the profiling results of the implemented BST in terms 
 of insertion time, emplacement time, and copy semantics. Besides, this report
 also presents the results of the lookups before and after balancing the tree
-for different tree sizes. Also, the results are constrasted against a 
+for different tree sizes. Also, the results are compared against a 
 `std::map` container.
 
 ## Profiling results
@@ -53,7 +53,19 @@ using the `insert()` or `emplace()` methods.
 ![](plots/insertion.png)
 
 The picture presented above summarises the performance of the insertion
-process in both, the *bst* and the `std::map`. It is possible to notice
+process in both, the *bst* and the `std::map`. It is possible to notice that 
+the insertion and emplacement in the `std::map` behaves similarly, whereas in 
+the *bst* case, it is different. The difference could be due to caching or 
+another kind of phenomenon, given that the emplacement uses the insertion 
+method inside.
+
+Besides, the insertion process in bst is faster than the `std::map` when the 
+number of elements reaches the `100'000`, whereas for smaller cases (tens),
+the `std::map` behaves faster but inside of the same order of magnitude.
+
+This means that the bst implementation is competitive even when the tree hasn't
+been balanced, since the balancing affects given that before inserting, the
+implementation performs a lookup for the leaf/node to be filled.
 
 2. **Finding**
 
