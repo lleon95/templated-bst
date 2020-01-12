@@ -138,7 +138,7 @@ void benchmark()
 #endif
   END_PROFILE(find_unbalanced)
 
-  if constexpr(std::is_same_v<T, bst_t>){
+  if constexpr(std::is_same<T, bst_t>::value){
     std::cout << "-- Find balanced" << std::endl;
     mytree1.balance();
     START_PROFILE(find_balanced, bst_profiler, number_iters)
@@ -162,14 +162,14 @@ void benchmark()
   std::cout << "Retrieving -> " << key << " Result: "
   << result << std::endl;
 #else
-  mytree[key];
+  mytree1[key];
 #endif
   END_PROFILE(suscription_retrieve)
 
   std::cout << "-- Subscription: setting" << std::endl;
   START_PROFILE(subscription_setting, bst_profiler, number_iters)
   int key = rand() % (number_elements * 100);
-  mytree[key] = key;
+  mytree1[key] = key;
 #ifdef ENABLE_VERBOSE
   std::cout << "Setting -> " << key << " Result: "
   << key << std::endl;
