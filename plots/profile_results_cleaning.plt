@@ -1,6 +1,6 @@
 #!/usr/local/bin/gnuplot --persist
 
-set title "{/=15 Finding process profiling} \n\n {/=12 Using bst and std::map" # plot title
+set title "{/=15 Cleaning process profiling} \n\n {/=12 Using bst and std::map" # plot title
 set xlabel 'Number of elements randomly generated'                               # x-axis label
 set ylabel 'Runtime (s)'                                                         # y-axis label
 set logscale xy
