@@ -75,20 +75,66 @@ performs an insertion in case that the element is not in the tree.
 
 ![](plots/finding.png)
 
+In the case of *bst*, the subscription operator has been invoked after 
+balancing the tree. For that reason, the behaviour of the `Find Balanced` and the `Subscription` should be similar.
+
+When the tree is unbalanced, the performance is much better than after 
+balancing. It suggests that the balancing algorithm is not suitable for the 
+applicacion and should be re-designed. In the particular case of the finding 
+when the tree is not balanced, the performance is better than the achieved by
+`std::map`. However, the performance is close amongst both approaches.
+
+The current balancing implementation in *bst* is such that the tree is 
+splitted to give four leaves. In this case, the number of nodes will increase 
+in four directions and it might not balance the tree as the number of nodes 
+increases.
+
 3. **Semantics**
 
-In the case of the copy/move semantics
+In the case of the copy/move semantics, the copy assignment and move 
+constructor were used for performance measurements. The difference between 
+assigment and construction is small. Nevertheless, the construction results in
+better results.
 
 ![](plots/semantics.png)
 
+The plot for the semantics illustrates that the performances between moving and
+ copying the trees in both, the *bst* and `std::map` are almost the same. In 
+ the case of the move semantics, it is just move the pointer, and it doesn't 
+ take significant computational resources.
+
 4. **Cleaning**
+
+The cleaning process behaves similarly in both cases.
 
 ![](plots/cleaning.png)
 
 ## Lookups performance
 
+Going deeper into the lookup performance, by definition, the behaviour should follow an `O(log(n))`, where `n` is the number of elements in the tree.
+
 ![](plots/lookup.png)
 
-### BST
+The plot shown above depicts the behaviour of the lookups in the *bst* and 
+`std::map`. For the *bst* case, there are two possible scenarios. The first 
+one given by an unbalanced tree and the second one after balancing the tree 
+naively.
 
-### `std::map`
+For the unbalanced case, the performance of both approaches 
+(*bst* and `std::map`) is quite similar. They follow the same tendency, being 
+under the `O(log(n))` when the number of elements is lower than `100'000`. 
+This consumption results in a desired case. However, when the number of 
+elements starts to be near to the `100'000s`, the performance in both, *bst*
+and `std::map` started to reach the ideal case. In general, the performance of 
+*bst* is very competitive to the `std::map` when the tree is unbalanced and 
+with a semi-random dataset.
+
+On the other hand, the balanced case gave worst results, for the reason that was mentioned above. However, when the number of elements is close to 100, the performance of the balanced tree became competitive respect to the others.
+
+## Conclusions
+
+The *bst* implementation is competitive to the `std::map` found in the 
+standard library. The performance results suggested that in copying, moving 
+and inserting, the performance was close one to the other. Nevertheless, the 
+balancing of the tree needs to be reconsidered in order to get better results
+when the dataset becomes more regular (unbalanced).
