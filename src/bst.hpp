@@ -240,43 +240,37 @@ public:
   }
 
   /**
+   * @brief Balance auxiliar
+   */
+  void fill(std::vector<pair_t> &buffer, const long long int &begin,
+            const long long int &end) {
+
+    insert(buffer[(end + begin) / 2]);
+
+    if (begin >= end)
+      return;
+
+    fill(buffer, begin, ((end + begin) / 2) - 1);
+    fill(buffer, ((end + begin) / 2) + 1, end);
+  }
+
+  /**
    * @brief Balance
    * @details A very naive implementation
    */
   void balance() {
-    std::vector<pair_t> buffer{};
+    if (!root)
+      return;
+
+    std::vector<pair_t> buffer;
     /* Load into a buffer */
     for (auto i : *(this)) {
       buffer.push_back(i);
     }
 
-    /* Abort if no elements */
-    if (buffer.size() == 0)
-      return;
-
     /* Start reordering */
     clear();
-
-    size_t half = buffer.size() / 2;
-    size_t quarter = half / 2;
-
-    insert(buffer.at(half));
-    insert(buffer.at(half + quarter));
-    insert(buffer.at(half - quarter));
-    for (size_t i{1}; i <= quarter; ++i) {
-      size_t leftm_left_idx = quarter - i;
-      size_t leftm_right_idx = quarter + i;
-      size_t rightm_left_idx = half + quarter - i;
-      size_t rightm_right_idx = half + quarter + i;
-
-      if (leftm_right_idx != half)
-        insert(buffer.at(leftm_right_idx));
-      if (rightm_right_idx != buffer.size())
-        insert(buffer.at(rightm_right_idx));
-
-      insert(buffer.at(leftm_left_idx));
-      insert(buffer.at(rightm_left_idx));
-    }
+    fill(buffer, 0, buffer.size() - 1);
   }
 };
 
