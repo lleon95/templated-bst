@@ -43,6 +43,12 @@ To verify memory leakage:
 make mem-check
 ```
 
+To generate all the reports and benchmarks:
+
+```bash
+./generate_report.sh
+```
+
 ### Development environment
 
 The code was run on a machine with the following characteristics:
@@ -54,3 +60,7 @@ The code was run on a machine with the following characteristics:
 **Disclaimer**: The timing results might change if the code is run on a machine
 with different characteristics, especially if the hardware bugs were mitigated
 (meltdown and spectre).
+
+------------------------
+
+**Student**: Luis G. Leon Vega - 2020

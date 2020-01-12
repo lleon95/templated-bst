@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -g -std=c++17 -O3
 
-SRC = $(wildcard *.[ch]pp)
+SRC = $(wildcard *.[ch]pp src/*.[ch]pp)
 
 EXE = $(SRC:.cpp=.x)
 
