@@ -78,16 +78,10 @@ performs an insertion in case that the element is not in the tree.
 In the case of *bst*, the subscription operator has been invoked after 
 balancing the tree. For that reason, the behaviour of the `Find Balanced` and the `Subscription` should be similar.
 
-When the tree is unbalanced, the performance is much better than after 
-balancing. It suggests that the balancing algorithm is not suitable for the 
-applicacion and should be re-designed. In the particular case of the finding 
-when the tree is not balanced, the performance is better than the achieved by
-`std::map`. However, the performance is close amongst both approaches.
-
-The current balancing implementation in *bst* is such that the tree is 
-splitted to give four leaves. In this case, the number of nodes will increase 
-in four directions and it might not balance the tree as the number of nodes 
-increases.
+According to the plot, the *bst* implementation performs better than the 
+`std::map` after the `1000s` of elements. However, it is possible to notice 
+that almost from the begining, the *bst* subscription behaves much better than 
+the `std::map`.
 
 3. **Semantics**
 
@@ -129,12 +123,14 @@ and `std::map` started to reach the ideal case. In general, the performance of
 *bst* is very competitive to the `std::map` when the tree is unbalanced and 
 with a semi-random dataset.
 
-On the other hand, the balanced case gave worst results, for the reason that was mentioned above. However, when the number of elements is close to 100, the performance of the balanced tree became competitive respect to the others.
+On the other hand, the balanced case gave better results than the `std::map` 
+and the *bst* with the tree unbalanced when the number of elements was greater 
+than `1000`. This is expected since the balanced tree should be shorter than 
+the unbalanced, since the balancing is in charge of minimising the tree's 
+height.
 
 ## Conclusions
 
 The *bst* implementation is competitive to the `std::map` found in the 
 standard library. The performance results suggested that in copying, moving 
-and inserting, the performance was close one to the other. Nevertheless, the 
-balancing of the tree needs to be reconsidered in order to get better results
-when the dataset becomes more regular (unbalanced).
+and inserting, the performance was close one to the other.
