@@ -64,3 +64,4 @@ with different characteristics, especially if the hardware bugs were mitigated
 ------------------------
 
 **Student**: Luis G. Leon Vega - 2020
+**Version**: 0.1.0
