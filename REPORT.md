@@ -75,6 +75,8 @@ In the case of the copy/move semantics
 
 ## Lookups performance
 
+![](plots/lookup.png)
+
 ### BST
 
 ### `std::map`
