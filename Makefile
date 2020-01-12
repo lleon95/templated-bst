@@ -25,7 +25,7 @@ format: $(SRC)
 .PHONY: format
 
 mem-check:
-	valgrind --leak-check=yes main.x
+	valgrind --leak-check=yes ./main.x
 
 clean:
 	rm -f $(EXE) *~

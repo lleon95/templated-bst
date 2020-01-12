@@ -2,6 +2,7 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <unistd.h>
 #include <utility>
@@ -14,14 +15,26 @@
 #define ENABLE_PROFILE
 
 typedef bst<int, int>  bst_t;
-const int number_elements = 100;
-const int number_iters = 100;
-const int number_iter_semantics = 100;
+unsigned int number_elements = 100;
+unsigned int number_iters = 100;
+unsigned int number_iter_semantics = 100;
 
 template <typename T>
 void benchmark();
 
-int main(){
+int main(int argc, char ** argv){
+  if (argc >= 2) {
+    std::istringstream incoming{argv[1]};
+    incoming >> number_elements;
+  }
+  if (argc >= 3) {
+    std::istringstream incoming{argv[2]};
+    incoming >> number_iters;
+  }
+  if (argc >= 4) {
+    std::istringstream incoming{argv[3]};
+    incoming >> number_iter_semantics;
+  }
 #ifdef ENABLE_PROFILE
 
   std::cout << "*** Analysing BST ***" << std::endl;
@@ -36,7 +49,7 @@ int main(){
   /* Create a tree */
   std::cout << "Creating tree: ";
   for (size_t i{0}; i < number_elements; ++i){
-    int key = rand() % 100;
+    int key = rand() % (number_elements * 100);
     auto pair = std::make_pair(key,key);
     std::cout << key << " ";
     mytree.insert(pair);
@@ -44,10 +57,16 @@ int main(){
   std::cout << std::endl;
   /* Print */
   std::cout << mytree << std::endl;
-  bst_t mytree2 = mytree1;
+  bst_t mytree2 = mytree;
   /* Print */
   mytree2.balance();
   std::cout << mytree2 << std::endl;
+
+  INIT_PROFILER(bst_profiler);
+  START_PROFILE(last, bst_profiler, number_elements)
+  usleep(1000000);
+  END_PROFILE(last)
+  std::cout << bst_profiler << std::endl;
 
 #endif
   return 0;
@@ -65,7 +84,7 @@ void benchmark()
   /* Insertion */
   std::cout << "-- Insertion: copy" << std::endl;
   START_PROFILE(insertion_copy, bst_profiler, number_elements)
-  int key = rand() % 100;
+  int key = rand() % (number_elements * 100);
   auto pair = std::make_pair(key,key);
   
 #ifdef ENABLE_VERBOSE
@@ -79,7 +98,7 @@ void benchmark()
 
   std::cout << "-- Insertion: move" << std::endl;
   START_PROFILE(insertion_move, bst_profiler, number_elements)
-  int key = rand() % 100;
+  int key = rand() % (number_elements * 100);
 #ifdef ENABLE_VERBOSE
   auto result = mytree2.insert(std::make_pair(key,key));
   std::cout << "Inserting -> " << key << " Result: "
@@ -91,7 +110,7 @@ void benchmark()
 
   std::cout << "-- Emplace" << std::endl;
   START_PROFILE(emplace, bst_profiler, number_elements)
-  int key = rand() % 100;
+  int key = rand() % (number_elements * 100);
 #ifdef ENABLE_VERBOSE
   auto result = mytree.emplace(key,key);
   std::cout << "Emplacing -> " << key << " Result: "
@@ -108,7 +127,7 @@ void benchmark()
 
   std::cout << "-- Find unbalanced" << std::endl;
   START_PROFILE(find_unbalanced, bst_profiler, number_iters)
-  int key = rand() % 100;
+  int key = rand() % (number_elements * 100);
   
 #ifdef ENABLE_VERBOSE
   auto it = mytree1.find(key);
@@ -119,11 +138,11 @@ void benchmark()
 #endif
   END_PROFILE(find_unbalanced)
 
-  if constexpr(std::is_same_v<T, bst_t>){
+  if constexpr(std::is_same<T, bst_t>::value){
     std::cout << "-- Find balanced" << std::endl;
     mytree1.balance();
     START_PROFILE(find_balanced, bst_profiler, number_iters)
-    int key = rand() % 100;
+    int key = rand() % (number_elements * 100);
   
 #ifdef ENABLE_VERBOSE
     auto it = mytree1.find(key);
@@ -137,20 +156,20 @@ void benchmark()
 
   std::cout << "-- Subscription: retrieve" << std::endl;
   START_PROFILE(suscription_retrieve, bst_profiler, number_iters)
-  int key = rand() % 100;
+  int key = rand() % (number_elements * 100);
 #ifdef ENABLE_VERBOSE
   auto result = mytree[key];
   std::cout << "Retrieving -> " << key << " Result: "
   << result << std::endl;
 #else
-  mytree[key];
+  mytree1[key];
 #endif
   END_PROFILE(suscription_retrieve)
 
   std::cout << "-- Subscription: setting" << std::endl;
   START_PROFILE(subscription_setting, bst_profiler, number_iters)
-  int key = rand() % 100;
-  mytree[key] = key;
+  int key = rand() % (number_elements * 100);
+  mytree1[key] = key;
 #ifdef ENABLE_VERBOSE
   std::cout << "Setting -> " << key << " Result: "
   << key << std::endl;
@@ -159,14 +178,14 @@ void benchmark()
 
   std::cout << "-- Copy semantics: assignment" << std::endl;
 
-  START_PROFILE(copy_assignmet, bst_profiler, number_iter_semantics)
+  START_PROFILE(copy_assignment, bst_profiler, number_iter_semantics)
   T tree_test = ((i % 2 == 0) ? mytree : mytree1);
 #ifdef ENABLE_VERBOSE
   std::cout << "Copying -> Tree " << (i % 2) << "\n" <<
   ((i % 2 == 0) ? mytree : mytree1) <<std::endl;
   std::cout << "Copied: " << tree_test << std::endl;
 #endif
-  END_PROFILE(copy_assignmet)
+  END_PROFILE(copy_assignment)
 
   std::cout << "-- Copy semantics: construction" << std::endl;
   START_PROFILE(copy_construction, bst_profiler, number_iter_semantics)
@@ -181,13 +200,13 @@ void benchmark()
 
   std::cout << "-- Move semantics: assignment" << std::endl;
   GET_PROFILE_INSTANCE(move_assignment, bst_profiler)
-  for(auto i = 0; i < 20; i++){
+  for(unsigned int i = 0; i < number_iter_semantics; i++){
 #ifdef ENABLE_VERBOSE
     std::cout << "Creating new tree ... " << std::endl;
 #endif
     T test;
-    for(int i = 0; i < 20; ++i) {
-      int key = rand() % 100;
+    for(unsigned int i = 0; i < number_elements; ++i) {
+      int key = rand() % (number_elements * 100);
       test.insert(std::make_pair(key,key));
     }
 #ifdef ENABLE_VERBOSE
@@ -204,13 +223,13 @@ void benchmark()
 
   std::cout << "-- Move semantics: construction" << std::endl;
   GET_PROFILE_INSTANCE(move_construction, bst_profiler)
-  for(auto i = 0; i < 20; i++){
+  for(unsigned int i = 0; i < number_iter_semantics; i++){
 #ifdef ENABLE_VERBOSE
     std::cout << "Creating new tree ... " << std::endl;
 #endif
     T test;
-    for(int i = 0; i < 20; ++i) {
-      int key = rand() % 100;
+    for(unsigned i = 0; i < number_elements; ++i) {
+      int key = rand() % (number_elements * 100);
       test.insert(std::make_pair(key,key));
     }
 #ifdef ENABLE_VERBOSE
