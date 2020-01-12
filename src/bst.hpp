@@ -34,13 +34,13 @@ class bst{
     node() noexcept = default;
     ~node() noexcept = default;
 
-    explicit node(const pair_t &p) : pair{p}, left_child{nullptr}, right_child{nullptr} {
+    explicit node(const pair_t &p) noexcept : pair{p}, left_child{nullptr}, right_child{nullptr} {
     };
-    explicit node(pair_t &&p) : pair{std::move(p)}, left_child{nullptr}, right_child{nullptr} {
+    explicit node(pair_t &&p) noexcept : pair{std::move(p)}, left_child{nullptr}, right_child{nullptr} {
     };
-    node& operator=(const pair_t &p) {*this.pair = p; return *this;}
+    node& operator=(const pair_t &p) noexcept {*this.pair = p; return *this;}
     
-    explicit node(node * p, node * new_parent) 
+    explicit node(node * p, node * new_parent)
       : pair{p->pair}, parent{new_parent}, left_child{nullptr}, right_child{nullptr} 
     {
       if (p->left_child)
@@ -59,7 +59,7 @@ public:
   /**
    * @brief Clear
    */
-  void clear(){
+  void clear() {
     root.reset();
   }
 
@@ -69,7 +69,7 @@ public:
    * This will be used to get the next element, when executing this method
    * from the right child of the current node.
    */
-  static node * get_lower(node * leaf) {
+  static node * get_lower(node * leaf) noexcept {
     if(!leaf) return nullptr;
 
     if(leaf->left_child) {
@@ -108,15 +108,15 @@ public:
    * last one is the right-most (one-past the right-most) 
    */
   iterator begin() noexcept {return iterator{get_lower(root.get())};}
-  iterator end() {return iterator{nullptr};}
+  iterator end() noexcept {return iterator{nullptr};}
   
   /* From a range for loop */
-  const_iterator begin() const {return const_iterator{get_lower(root.get())};}
-  const_iterator end() const {return const_iterator{nullptr};}
+  const_iterator begin() const noexcept {return const_iterator{get_lower(root.get())};}
+  const_iterator end() const noexcept {return const_iterator{nullptr};}
   
   /* Elevated user */
-  const_iterator cbegin() const {return const_iterator{get_lower(root.get())};}
-  const_iterator cend() const {return const_iterator{nullptr};}
+  const_iterator cbegin() const noexcept {return const_iterator{get_lower(root.get())};}
+  const_iterator cend() const noexcept {return const_iterator{nullptr};}
  
   /**
    * @brief Lookup 
